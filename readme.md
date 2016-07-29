@@ -122,6 +122,6 @@ name=猫 这个参数会被映射到 Animal 的 name 属性。
 
  > 支持 POJO 类的参数映射, 这个无需注解, POJO 可以直接从 request 中去解析, 并赋值。
 
- > 可以支持 sparkjava 方式的方法, 参数中只有  request 和 response 两个参数。
+ > 参数中只有  request 和 response 两个参数的, 将被直接转发。
 
  > 方法默认会映射成 GET, 方法名以 「$」 开头的将被映射成 POST。
