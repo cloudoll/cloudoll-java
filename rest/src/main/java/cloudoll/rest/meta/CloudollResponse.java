@@ -1,23 +1,12 @@
-package cloudoll.rest.exceptions;
+package cloudoll.rest.meta;
 
 import com.alibaba.fastjson.JSONObject;
 
-/**
- * 自定义错误
- */
-public class CloudollException extends Exception {
-
-    public CloudollException(int errno, String message, String service) {
-        super(message + " [" + errno + "] @ " + service);
-        this.errno = errno;
-        this.errText = message;
-        this.service = service;
-    }
-
-
+public class CloudollResponse {
     private Integer errno;
     private String errText;
     private String service;
+    private Object data;
 
     public String getErrText() {
         return errText;
@@ -27,6 +16,15 @@ public class CloudollException extends Exception {
         this.errText = errText;
     }
 
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+
     public Integer getErrno() {
         return errno;
     }
@@ -34,6 +32,7 @@ public class CloudollException extends Exception {
     public void setErrno(Integer errno) {
         this.errno = errno;
     }
+
 
     public String getService() {
         return service;
@@ -43,10 +42,8 @@ public class CloudollException extends Exception {
         this.service = service;
     }
 
-
     @Override
     public String toString() {
         return JSONObject.toJSONString(this);
     }
-
 }

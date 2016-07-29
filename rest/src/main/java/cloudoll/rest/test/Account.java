@@ -6,6 +6,9 @@ import cloudoll.rest.annotation.Service;
 import spark.Request;
 import spark.Response;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class Account {
     @Method(title = "获取A")
@@ -19,30 +22,34 @@ public class Account {
     }
 
     @Method(title = "多个参数")
-    public String testMany(
+    public Object testMany(
             @Param(name = "a", require = true) String a,
             @Param(name = "b", require = true) int b,
             @Param(name = "c", require = true) float c,
             int d,
             Animal animal) {
-        return a + b + c + "<br>"
-                + d + "<br>"
-                + animal.getName() + "<br>" + (b * c);
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", a);
+        map.put("b", b);
+        map.put("c", c);
+        map.put("d", d);
+        map.put("list", new String[]{"1", "2", "3"});
+        map.put("animal", animal);
+        return map;
     }
 
 
     @Method(title = "多个参数")
-    public String $testMany(
+    public Object $testMany(
             @Param(name = "a", require = true) String a,
             @Param(name = "b", require = true) int b,
             @Param(name = "c", require = true) float c,
             int d,
             Animal animal) {
-        return a + b + c + "<br>"
-                + d + "<br>"
-                + "动物名字: " +  animal.getName()  + "<br>"
-                + "动物重量: " +  animal.getWeight()  + "<br>"
-                + "<br>" + (b * c);
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", new String[]{"1", "2", "3"});
+        map.put("animal", animal);
+        return map;
     }
 
 

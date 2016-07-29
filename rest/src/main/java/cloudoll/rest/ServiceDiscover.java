@@ -4,7 +4,10 @@ package cloudoll.rest;
 import cloudoll.rest.annotation.Method;
 import cloudoll.rest.annotation.Service;
 import cloudoll.rest.exceptions.CloudollException;
-import cloudoll.rest.meta.*;
+import cloudoll.rest.meta.App;
+import cloudoll.rest.meta.CloudollMethod;
+import cloudoll.rest.meta.CloudollParam;
+import cloudoll.rest.meta.ServiceTypes;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -116,11 +119,9 @@ public class ServiceDiscover {
             }
         });
         exception(CloudollException.class, (exception, request, response) -> {
-            //exception.printStackTrace();
             CloudollException ex = (CloudollException) exception;
-            System.out.println(ex.getErrText());
-//            exception.getMessage();
-            response.body(ex.getErrText());
+            response.type("application/json");
+            response.body(ex.toString());
         });
 
     }

@@ -6,6 +6,7 @@ import cloudoll.rest.exceptions.FormatException;
 import cloudoll.rest.meta.App;
 import cloudoll.rest.meta.CloudollMethod;
 import cloudoll.rest.meta.CloudollParam;
+import cloudoll.rest.meta.CloudollResponse;
 import spark.Request;
 import spark.Response;
 
@@ -157,10 +158,12 @@ class Tools {
                     } else {
                         inParams.add(Tools.toObject(pp.getClazz(), null));
                     }
-
                 }
-
-                Object res = method.invoke(method.getDeclaringClass().newInstance(), inParams.toArray());
+                response.type("application/json");
+                Object data = method.invoke(method.getDeclaringClass().newInstance(), inParams.toArray());
+                CloudollResponse res = new CloudollResponse();
+                res.setData(data);
+                res.setErrno(0);
                 return res;
             }
         } catch (CloudollException e) {
@@ -170,4 +173,5 @@ class Tools {
             throw new CloudollException(-1, "未知错误", App.serviceName);
         }
     }
+
 }
