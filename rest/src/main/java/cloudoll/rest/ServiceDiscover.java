@@ -1,24 +1,25 @@
 package cloudoll.rest;
 
 
-import cloudoll.rest.annotation.Service;
 import cloudoll.rest.annotation.Method;
-import cloudoll.rest.meta.CloudollMethod;
-import cloudoll.rest.meta.CloudollParam;
-import cloudoll.rest.meta.ServiceTypes;
+import cloudoll.rest.annotation.Service;
+import cloudoll.rest.exceptions.CloudollException;
+import cloudoll.rest.meta.*;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.reflections.ReflectionUtils.*;
-import static spark.Spark.get;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 /**
- *
+ * 服务发现类
  */
 public class ServiceDiscover {
 
@@ -50,7 +51,6 @@ public class ServiceDiscover {
                 String controllerName = controller.getName();
                 controllerName = controllerName.substring(controllerName.lastIndexOf('.') + 1);
                 String pathName = baseRoute + "/" + Tools.toRestUrlName(controllerName);
-
 
 
                 Set<java.lang.reflect.Method> methods = getAllMethods(controller,
@@ -93,7 +93,12 @@ public class ServiceDiscover {
     }
 
 
-   public static void startService(String[] packages){
+    public static void startService(String[] packages) {
+        if (App.serviceName == null || App.servicePort == 0) {
+            throw new RuntimeException("必须初始化 App");
+        }
+        System.out.println("服务启动, 位于端口: " + App.servicePort);
+        port(App.servicePort);
         ServiceDiscover mf = new ServiceDiscover(packages);
         Set<CloudollMethod> map = mf.scan();
         map.forEach((ms) -> {
@@ -110,8 +115,15 @@ public class ServiceDiscover {
                 get(ms.getPath(), (request, response) -> Tools.invoke(ms, params, request, response));
             }
         });
-    }
+        exception(CloudollException.class, (exception, request, response) -> {
+            //exception.printStackTrace();
+            CloudollException ex = (CloudollException) exception;
+            System.out.println(ex.getErrText());
+//            exception.getMessage();
+            response.body(ex.getErrText());
+        });
 
+    }
 
 
     public String[] getPackages() {

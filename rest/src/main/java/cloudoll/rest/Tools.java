@@ -1,6 +1,9 @@
 package cloudoll.rest;
 
 import cloudoll.rest.annotation.Param;
+import cloudoll.rest.exceptions.CloudollException;
+import cloudoll.rest.exceptions.FormatException;
+import cloudoll.rest.meta.App;
 import cloudoll.rest.meta.CloudollMethod;
 import cloudoll.rest.meta.CloudollParam;
 import spark.Request;
@@ -14,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.reflections.ReflectionUtils.*;
+import static org.reflections.ReflectionUtils.getAllFields;
 
 /**
- * Created by xiezhengwei on 16/7/28.
+ * 工具类
  */
 class Tools {
     static String toRestUrlName(String javaName) {
@@ -50,16 +53,20 @@ class Tools {
     }
 
 
-    static Object toObject(Class clazz, String value) {
-        if (Boolean.class == clazz || boolean.class == clazz)
-            return value != null && Boolean.parseBoolean(value);
-        if (Byte.class == clazz || byte.class == clazz) return value == null ? 0 : Byte.parseByte(value);
-        if (Short.class == clazz || short.class == clazz) return value == null ? 0 : Short.parseShort(value);
-        if (Integer.class == clazz || int.class == clazz) return value == null ? 0 : Integer.parseInt(value);
-        if (Long.class == clazz || long.class == clazz) return value == null ? 0 : Long.parseLong(value);
-        if (Float.class == clazz || float.class == clazz) return value == null ? 0 : Float.parseFloat(value);
-        if (Double.class == clazz || double.class == clazz) return value == null ? 0 : Double.parseDouble(value);
-        return value;
+    static Object toObject(Class clazz, String value) throws FormatException {
+        try {
+            if (Boolean.class == clazz || boolean.class == clazz)
+                return value != null && Boolean.parseBoolean(value);
+            if (Byte.class == clazz || byte.class == clazz) return value == null ? 0 : Byte.parseByte(value);
+            if (Short.class == clazz || short.class == clazz) return value == null ? 0 : Short.parseShort(value);
+            if (Integer.class == clazz || int.class == clazz) return value == null ? 0 : Integer.parseInt(value);
+            if (Long.class == clazz || long.class == clazz) return value == null ? 0 : Long.parseLong(value);
+            if (Float.class == clazz || float.class == clazz) return value == null ? 0 : Float.parseFloat(value);
+            if (Double.class == clazz || double.class == clazz) return value == null ? 0 : Double.parseDouble(value);
+            return value;
+        } catch (Throwable e) {
+            throw new FormatException("格式错误: 「" + value + "」 不能被格式化成 " + clazz.getName(), App.serviceName);
+        }
     }
 
     static boolean isPOJO(Class clazz) {
@@ -107,7 +114,6 @@ class Tools {
     static Object bindPOJO(Class clazz, Request request) {
         try {
             Object instance = clazz.newInstance();
-            Set<Method> methods = getAllMethods(clazz, withPrefix("set"), withParametersCount(1));
             Set<Field> fields = getAllFields(clazz);
             fields.forEach(
                     field -> {
@@ -132,7 +138,8 @@ class Tools {
 
     }
 
-    static Object invoke(CloudollMethod ms, List<CloudollParam> params, Request request, Response response) {
+    static Object invoke(CloudollMethod ms, List<CloudollParam> params, Request request, Response response)
+            throws CloudollException {
 
         try {
             Method method = ms.getMethod();
@@ -141,27 +148,26 @@ class Tools {
             } else {
 
                 List<Object> inParams = new ArrayList<>();
-                params.forEach(pp -> {
+                for (CloudollParam pp : params) {
                     String val = request.queryParams(pp.getName());
                     if (pp.isRequestKey() && !pp.isPOJO()) {
                         inParams.add(Tools.toObject(pp.getClazz(), val));
                     } else if (pp.isPOJO()) {
-                        try {
-                            inParams.add(bindPOJO(pp.getClazz(), request));
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
+                        inParams.add(bindPOJO(pp.getClazz(), request));
                     } else {
                         inParams.add(Tools.toObject(pp.getClazz(), null));
                     }
-                });
 
-                System.out.println(inParams);
-                return method.invoke(method.getDeclaringClass().newInstance(), inParams.toArray());
+                }
+
+                Object res = method.invoke(method.getDeclaringClass().newInstance(), inParams.toArray());
+                return res;
             }
+        } catch (CloudollException e) {
+            throw e;
         } catch (Throwable e) {
             e.printStackTrace();
-            return null;
+            throw new CloudollException(-1, "未知错误", App.serviceName);
         }
     }
 }
