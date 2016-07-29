@@ -2,6 +2,8 @@
 
 目的是辅助快速创建可分布的微服务。
 
+clone 这个项目, 运行一下项目里的 cloudoll.rest.Server 试试看。
+
 一下是一些特性
 
 * 使用 [sparkjava](http://sparkjava.com/) 创建 restful 的服务
