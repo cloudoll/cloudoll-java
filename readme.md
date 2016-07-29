@@ -4,7 +4,37 @@
 
 clone 这个项目, 运行一下项目里的 cloudoll.rest.Server 试试看。
 
-一下是一些特性
+
+运行之后测试一下:
+
+```
+http://localhost:2000/open/account/test-many?a=xxx&b=2&c=1.1&name=猫
+```
+
+页面的输出结果大约是:
+
+```json
+{
+    "data": {
+        "a": "xxx",
+        "b": 1,
+        "c": 1.1,
+        "d": 0,
+        "animal": {
+            "name": "猫",
+            "weight": 0
+        },
+        "list": [
+            "1",
+            "2",
+            "3"
+        ]
+    },
+    "errno": 0
+}
+```
+
+以下是一些特性:
 
 * 使用 [sparkjava](http://sparkjava.com/) 创建 restful 的服务
 
@@ -45,41 +75,26 @@ import spark.Response;
 
 @Service
 public class Account {
-    @Method(title = "获取A")
-    public String getA() {
-        return "a";
-    }
-
-    @Method(title = "提交B")
+    @Method(title = "这是 POST")
     public String $addB() {
         return "b";
     }
 
-    @Method(title = "GET多个参数")
-    public String testMany(
+    @Method(title = "多重的")
+    public Object testMany(
             @Param(name = "a", require = true) String a,
             @Param(name = "b", require = true) int b,
             @Param(name = "c", require = true) float c,
             int d,
             Animal animal) {
-        return a + b + c + "<br>"
-                + d + "<br>"
-                + animal.getName() + "<br>" + (b * c);
-    }
-
-
-    @Method(title = "POST多个参数")
-    public String $testMany(
-            @Param(name = "a", require = true) String a,
-            @Param(name = "b", require = true) int b,
-            @Param(name = "c", require = true) float c,
-            int d,
-            Animal animal) {
-        return a + b + c + "<br>"
-                + d + "<br>"
-                + "动物名字: " +  animal.getName()  + "<br>"
-                + "动物重量: " +  animal.getWeight()  + "<br>"
-                + "<br>" + (b * c);
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", a);
+        map.put("b", b);
+        map.put("c", c);
+        map.put("d", d);
+        map.put("list", new String[]{"1", "2", "3"});
+        map.put("animal", animal);
+        return map;
     }
 
 
@@ -91,11 +106,6 @@ public class Account {
 
 ```
 
-运行之后测试一下:
-
-```
-http://localhost:2000/open/account/test-many?a=xxx&b=2&c=1.1&name=猫
-```
 
 上面的例子中 a b c 分别会被映射到方法 testMany 中的对应参数,
 name=猫 这个参数会被映射到 Animal 的 name 属性。

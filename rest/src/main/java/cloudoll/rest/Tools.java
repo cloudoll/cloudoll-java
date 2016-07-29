@@ -46,8 +46,6 @@ class Tools {
         if (parameters.length == 2) {
             Parameter req = parameters[0];
             Parameter res = parameters[1];
-            System.out.println(req.getType());
-            System.out.println(res);
             return (req.getType() == Request.class && res.getType() == Response.class);
         }
         return false;
@@ -121,7 +119,6 @@ class Tools {
                         String val = request.queryParams(field.getName());
                         String fieldName = field.getName();
                         String methodName = "set" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);
-                        System.out.println(methodName);
                         try {
                             Method setMethod = clazz.getDeclaredMethod(methodName, field.getType());
                             setMethod.invoke(instance, toObject(field.getType(), val));
