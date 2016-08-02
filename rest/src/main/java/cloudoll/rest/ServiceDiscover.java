@@ -95,13 +95,12 @@ public class ServiceDiscover {
         return allServices;
     }
 
-
     public static void startService(String[] packages) {
-        if (App.serviceName == null || App.servicePort == 0) {
+        if (App.myName == null || App.myPort == 0) {
             throw new RuntimeException("必须初始化 App");
         }
-        System.out.println("服务启动, 位于端口: " + App.servicePort);
-        port(App.servicePort);
+        System.out.println("服务启动, 位于端口: " + App.myPort);
+        port(App.myPort);
         ServiceDiscover mf = new ServiceDiscover(packages);
         Set<CloudollMethod> map = mf.scan();
         map.forEach((ms) -> {

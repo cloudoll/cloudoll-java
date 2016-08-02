@@ -64,7 +64,7 @@ class Tools {
             if (Double.class == clazz || double.class == clazz) return value == null ? 0 : Double.parseDouble(value);
             return value;
         } catch (Throwable e) {
-            throw new FormatException("格式错误: 「" + value + "」 不能被格式化成 " + clazz.getName(), App.serviceName);
+            throw new FormatException("格式错误: 「" + value + "」 不能被格式化成 " + clazz.getName(), App.myName);
         }
     }
 
@@ -167,7 +167,7 @@ class Tools {
             throw e;
         } catch (Throwable e) {
             e.printStackTrace();
-            throw new CloudollException(-1, "未知错误", App.serviceName);
+            throw new CloudollException(-1, "未知错误", App.myName);
         }
     }
 
