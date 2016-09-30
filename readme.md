@@ -1,6 +1,8 @@
 # cloudoll 的 java 版本
 
-目的是辅助快速创建可分布的微服务。
+辅助快速创建可分布的微服务。
+
+目前的版本使用的注册中心是 [cloudoll-server-rest](https://github.com/cloudoll/cloudoll-server-rest)
 
 clone 这个项目, 运行一下项目里的 cloudoll.rest.Server 试试看。
 
